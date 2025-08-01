@@ -3,8 +3,9 @@ find_package(CUDAToolkit REQUIRED)
 enable_language(CUDA)
 
 # 设置CUDA架构
-set(CMAKE_CUDA_ARCHITECTURES 60 70 75 80 86)
-
+# set(CMAKE_CUDA_ARCHITECTURES 75 80 86)
+# auto detect architectures
+set(CMAKE_CUDA_ARCHITECTURES "native")
 # 设置CUDA标准
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
