@@ -31,7 +31,7 @@ sqrt	最大误差约为1个ULP	1.5-3倍
 除法操作	精度略有降低	1.5-2倍
 ULP (Unit in the Last Place) 是衡量浮点精度的单位，表示在给定数值的最低有效位上的一个单位变化。
 ]]
-target_compile_options(concurrent_host_divice PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
+target_compile_options(concurrent_host_device PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
     --use_fast_math
     #-lineinfo
 >)
