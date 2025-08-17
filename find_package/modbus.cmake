@@ -1,5 +1,5 @@
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(MODBUS REQUIRED libmodbus)
+pkg_check_modules(MODBUS libmodbus)
 
 if(MODBUS_FOUND)
     message(STATUS "Found libmodbus: V${MODBUS_VERSION} dir[${LIBMODBUS_LIBRARY_DIRS}] lib[${MODBUS_LIBRARIES}] inc[${MODBUS_INCLUDE_DIRS}]")
