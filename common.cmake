@@ -1,12 +1,33 @@
 cmake_minimum_required(VERSION 3.15)
 # use ALL_PROXY=socks5://xxxxx:9090
+
+option(ENABLE_LTO "Enable Link Time Optimization (IPO)" ON)
+option(ENABLE_THIN_LTO "Prefer ThinLTO when supported (Clang/LLVM)" OFF)
+option(ENABLE_FAT_LTO_OBJECTS "Build fat LTO objects (for library distribution)" OFF)
+
+include(CheckIPOSupported)
+
+if(ENABLE_LTO)
+  check_ipo_supported(RESULT have_ipo OUTPUT ipo_err)
+  if(have_ipo)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO ON)
+    message(STATUS "LTO/IPO enabled via CMake property")
+  else()
+    message(WARNING "IPO not supported: ${ipo_err}")
+    set(ENABLE_LTO_FALLBACK_FLAGS ON)
+  endif()
+else()
+    message(WARNING "LTO NOT ENABLED")
+endif()
+
 # config c++ flags
-add_library(cxx_flags INTERFACE)
-target_compile_features(cxx_flags INTERFACE cxx_std_20)
+add_library(cxx_options INTERFACE)
+target_compile_features(cxx_options INTERFACE cxx_std_20)
 
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-target_compile_options(cxx_flags INTERFACE
+target_compile_options(cxx_options INTERFACE
                        "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-Wno-class-memaccess;-Wno-deprecated-declarations>>"
                        "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3>>"
                       )
