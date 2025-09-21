@@ -24,15 +24,15 @@ if(ENABLE_FAST_MATH)
 endif()
 
 # IPO/LTO
-option(ENABLE_CUDA_DEVICE_LTO "Enable CUDA device LTO (-dlto)" ON)
+option(ENABLE_CUDA_DEVICE_LTO "Enable CUDA device LTO (-dlto) in Release config" ON)
 if(ENABLE_CUDA_DEVICE_LTO)
     # 设备 LTO：编译 + 链接都加 -dlto
   target_compile_options(cuda_options INTERFACE
-    $<$<COMPILE_LANGUAGE:CUDA>:-dlto>
+    $<$<AND:$<CONFIG:Release>,$<COMPILE_LANGUAGE:CUDA>>:-dlto>
   )
   # 设备链接阶段（nvlink）
   target_link_options(cuda_options INTERFACE
-    $<$<LINK_LANGUAGE:CUDA>:-dlto>
+    $<$<AND:$<CONFIG:Release>,$<LINK_LANGUAGE:CUDA>>:-dlto>
   )
 endif()
 endif()
