@@ -25,11 +25,12 @@ endif()
 add_library(cxx_options INTERFACE)
 target_compile_features(cxx_options INTERFACE cxx_std_20)
 
-set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
-set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+set(gcc_like_cxx $<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>)
+set(msvc_cxx $<COMPILE_LANG_AND_ID:CXX,MSVC>)
 target_compile_options(cxx_options INTERFACE
-                       "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-Wno-class-memaccess;-Wno-deprecated-declarations>>"
-                       "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3>>"
+                       $<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall>> #;-Wextra;-Wshadow;-Wformat=2;-Wunused;-Wno-class-memaccess;-Wno-deprecated-declarations>>
+                       $<${msvc_cxx}:$<BUILD_INTERFACE:/W3>>
+                       $<$<AND:${gcc_like_cxx},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-O0;-g3;-fno-omit-frame-pointer>>
                       )
 
 # config c++ definitions

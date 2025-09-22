@@ -6,6 +6,12 @@ set(CMAKE_C_COMPILER "/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
 include(./cmake_util/common.cmake)
+
+# Append User define options
+target_compile_options(cxx_options INTERFACE
+    $<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wno-class-memaccess;-Wno-deprecated-declarations>>
+)
+
 # find packages
 find_package(Threads REQUIRED)
 #include(./cmake_util/find_package/CUDA.cmake)
