@@ -37,18 +37,84 @@ target_compile_options(cxx_options INTERFACE
 string(TIMESTAMP COMPILE_TIME %Y-%m-%d_%H:%M:%S)
 set(build_time ${COMPILE_TIME})
 message(STATUS "COMPILE_TIME: ${COMPILE_TIME}")
-find_package(Git)
+
+find_package(Git QUIET)
+set(GIT_VERSION_STRING "unknown")
+set(GIT_COMMIT_HASH "unknown")
+set(GIT_BRANCH "unknown")
+set(GIT_DIRTY "")
+
 if(GIT_FOUND)
-    message(STATUS "Git found: ${GIT_EXECUTABLE} version:${GIT_VERSION_STRING}")
-#[[
-    set(GIT_HASH "")
-    get_git_hash(GIT_HASH)
-    set(GIT_BRANCH "")
-    get_git_branch(GIT_BRANCH)
-]]
+    execute_process(
+    COMMAND "${GIT_EXECUTABLE}" rev-parse --is-inside-work-tree
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    RESULT_VARIABLE _inside_repo_res
+    OUTPUT_VARIABLE _inside_repo_out
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  if(_inside_repo_res EQUAL 0 AND _inside_repo_out STREQUAL "true")
+    # 1) 优先用 git describe（需要 tag 存在），--always 确保无 tag 时也有输出
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" describe --tags --dirty --always --abbrev=7
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      RESULT_VARIABLE _desc_res
+      OUTPUT_VARIABLE _desc_out
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(_desc_res EQUAL 0 AND NOT _desc_out STREQUAL "")
+      set(GIT_VERSION_STRING "${_desc_out}")
+    endif()
+
+    # 2) 获取短哈希
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" rev-parse --short=7 HEAD
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      RESULT_VARIABLE _hash_res
+      OUTPUT_VARIABLE _hash_out
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(_hash_res EQUAL 0 AND NOT _hash_out STREQUAL "")
+      set(GIT_COMMIT_HASH "${_hash_out}")
+    endif()
+
+    # 3) 当前分支名（在某些 CI 上可能是 HEAD 或 detached）
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" rev-parse --abbrev-ref HEAD
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      RESULT_VARIABLE _branch_res
+      OUTPUT_VARIABLE _branch_out
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(_branch_res EQUAL 0 AND NOT _branch_out STREQUAL "")
+      set(GIT_BRANCH "${_branch_out}")
+    endif()
+
+    # 4) 是否有未提交修改（dirty 标记）
+    execute_process(
+      COMMAND "${GIT_EXECUTABLE}" diff --quiet
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      RESULT_VARIABLE _diff_res
+      ERROR_QUIET
+    )
+    if(NOT _diff_res EQUAL 0)
+      set(GIT_DIRTY "-dirty")
+    endif()
+  endif()
 else()
     message(WARNING "Git not found!")
 endif()
+# 最终的版本字符串，示例：v1.2.3-4-gabc1234-dirty 或 abc1234-dirty
+if(GIT_VERSION_STRING STREQUAL "unknown" AND NOT GIT_COMMIT_HASH STREQUAL "unknown")
+  set(GIT_VERSION_STRING "${GIT_COMMIT_HASH}")
+endif()
+if(NOT GIT_DIRTY STREQUAL "")
+  set(GIT_VERSION_STRING "${GIT_VERSION_STRING}${GIT_DIRTY}")
+endif()
+
 
 
 # 检查文件是否存在

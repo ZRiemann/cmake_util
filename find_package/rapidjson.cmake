@@ -24,8 +24,6 @@ else()
         DOWNLOAD_ONLY YES  # 仅下载，不构建（因为它是仅头文件库）
     )
     ]]
-    #DOWNLOAD_ONLY YES 时，CPM 只下载源码，不会 add_subdirectory 或注册包的 CMake config。
-    #find_package(RapidJSON QUIET) # 亲试，无效
 
     add_library(rapidjson::rapidjson INTERFACE IMPORTED)
     set_target_properties(rapidjson::rapidjson PROPERTIES
