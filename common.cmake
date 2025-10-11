@@ -71,7 +71,10 @@ endif()
 #list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # 改进的 CPM.cmake 下载逻辑
-set(CPM_DIR "${CMAKE_BINARY_DIR}/cmake/CPM.cmake" CACHE PATH "CPM Path")
+if(NOT DEFINED ENV{CPM_SOURCE_CACHE})
+    set(ENV{CPM_SOURCE_CACHE} "${CMAKE_SOURCE_DIR}/.cpm_cache")
+endif()
+set(CPM_DIR "$ENV{CPM_SOURCE_CACHE}/CPM.cmake" CACHE PATH "CPM Path")
 
 # 检查文件是否存在且非空
 if(NOT EXISTS ${CPM_DIR} OR NOT CPM_DIR)

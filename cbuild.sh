@@ -28,13 +28,9 @@ if [ "$1" == "d" ]; then
 fi
 
 if [ "$2" == "r" ] && [ -d "${DIR}" ]; then
-    mv $DIR $DIR.old
-    echo "remove $DIR"
+    echo "remove $DIR and remake it"
     rm -fr $DIR
     mkdir $DIR
-    mv $DIR.old/_deps $DIR
-    mv $DIR.old/cmake $DIR
-    rm -fr $DIR.old
 fi
 
 if [ -d "$DIR" ]; then
