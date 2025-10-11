@@ -138,7 +138,7 @@ endif()
 
 # 改进的 CPM.cmake 下载逻辑
 if(NOT DEFINED ENV{CPM_SOURCE_CACHE})
-    set(ENV{CPM_SOURCE_CACHE} "${CMAKE_SOURCE_DIR}/.cpm_cache")
+    set(ENV{CPM_SOURCE_CACHE} "${CMAKE_SOURCE_DIR}/cpm_cache")
 endif()
 set(CPM_DIR "$ENV{CPM_SOURCE_CACHE}/CPM.cmake" CACHE PATH "CPM Path")
 

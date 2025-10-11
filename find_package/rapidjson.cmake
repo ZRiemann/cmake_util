@@ -1,11 +1,18 @@
+# 2) 如果没找到，尝试使用用户指定的 RAPIDJSON_ROOT（纯头文件路径）
+if (DEFINED RAPIDJSON_ROOT)
+  message(STATUS "Using RapidJSON from RAPIDJSON_ROOT: ${RAPIDJSON_ROOT}")
+  if (NOT TARGET rapidjson::rapidjson)
+    add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+    set_target_properties(rapidjson::rapidjson PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${RAPIDJSON_ROOT}"
+    )
+  endif()
+  return()
+endif()
 
-# 尝试查找 RapidJSON
 find_package(RapidJSON QUIET)
 
-# 检查是否找到
-if(RapidJSON_FOUND)
-    message(STATUS "RapidJSON found: ${RapidJSON_INCLUDE_DIRS}")
-else()
+if(NOT TARGET rapidjson::rapidjson)
     message(STATUS "RapidJSON not found, will download it")
     # 添加 RapidJSON
     CPMAddPackage(

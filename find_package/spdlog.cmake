@@ -1,4 +1,15 @@
-# 尝试查找 spdlog
+# 2) 如果没找到，尝试使用用户指定的 spdlog_ROOT（纯头文件路径）
+if (DEFINED SPDLOG_ROOT)
+  message(STATUS "Using spdlog from SPDLOG_ROOT: ${SPDLOG_ROOT}")
+  if (NOT TARGET spdlog::spdlog)
+    add_library(spdlog::spdlog INTERFACE IMPORTED)
+    set_target_properties(spdlog::spdlog PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${SPDLOG_ROOT}"
+    )
+  endif()
+  return()
+endif()
+
 find_package(spdlog QUIET)
 
 # 检查是否找到
