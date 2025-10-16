@@ -2,6 +2,7 @@ find_package(NNG QUIET)
 
 #sudo apt update
 #sudo apt install libmbedtls-dev
+#sudo apt install libnng-dev
 #dpkg -l | grep mbedtls
 #[[
 # 尝试查找 MbedTLS
@@ -33,8 +34,6 @@ endif()
 ]]
 if(NOT NNG_FOUND)
     message(STATUS "NNG not found, will download and build it")
-    
-    # 使用 CPM 添加 NNG
     CPMAddPackage(
         NAME nng
         GITHUB_REPOSITORY nanomsg/nng
@@ -48,20 +47,16 @@ if(NOT NNG_FOUND)
             "NNG_ENABLE_HTTP ON"
     )
     
-    # 如果使用 CPM，不需要额外创建导入目标，因为 CPM 会自动处理
-    # 只需确保 nng 目标可用
-    if(NOT TARGET nng)
-        message(FATAL_ERROR "Failed to build NNG")
-    else()
-        message(STATUS "NNG found: ${nng_SOURCE_DIR}")
+    message(STATUS "NNG found: ${nng_SOURCE_DIR}")        
+    # Create an alias target that matches the expected name
+    if(NOT TARGET nng::nng)
+        add_library(nng::nng ALIAS nng)
     endif()
 else()
     message(STATUS "Found NNG: ${NNG_LIBRARIES}")
 endif()
 
-find_package(nng CONFIG REQUIRED)
 message(STATUS "Using nng ${nng_VERSION}")
-
 #[[
 # demo
 add_executable(nng_example src/main.c)
