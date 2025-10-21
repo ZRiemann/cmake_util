@@ -37,7 +37,9 @@ if(NOT NNG_FOUND)
     CPMAddPackage(
         NAME nng
         GITHUB_REPOSITORY nanomsg/nng
-        VERSION 1.10.1
+        VERSION 2.0.0-alpha.6
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
         OPTIONS
             "NNG_TESTS OFF"
             "NNG_TOOLS OFF"
