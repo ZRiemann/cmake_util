@@ -33,6 +33,9 @@ target_compile_options(cxx_options INTERFACE
                        $<$<AND:${gcc_like_cxx},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-O0;-g3;-fno-omit-frame-pointer>>
                       )
 
+# 让 CMake 能在 ~/.local 下找包
+list(PREPEND CMAKE_PREFIX_PATH "$ENV{HOME}/.local")
+
 # config c++ definitions
 string(TIMESTAMP COMPILE_TIME %Y-%m-%d_%H:%M:%S)
 set(build_time ${COMPILE_TIME})

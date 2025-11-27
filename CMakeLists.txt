@@ -11,6 +11,11 @@ include(./cmake_util/common.cmake)
 
 # find packages
 find_package(Threads REQUIRED)
+# Meta libs
+find_package(folly REQUIRED)
+include(./cmake_util/find_package/jmalloc.cmake)
+# Google libs
+
 
 #set(RAPIDJSON_ROOT "/home/booster/tmp" CACHE PATH "RapidJSON include root") # 指定用户目录，不使用CPM下载
 include(./cmake_util/find_package/rapidjson.cmake)
@@ -20,7 +25,6 @@ include(./cmake_util/find_package/spdlog.cmake)
 
 #include(./cmake_util/find_package/CUDA.cmake)
 #include(./cmake_util/find_package/grpc.cmake)
-#include(./cmake_util/find_package/jmalloc.cmake)
 #include(./cmake_util/find_package/modbus.cmake)
 #include(./cmake_util/find_package/nng.cmake)
 #include(./cmake_util/find_package/OpenCV.cmake)
