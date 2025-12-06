@@ -38,6 +38,7 @@ if(NOT NNG_FOUND)
         NAME nng
         GITHUB_REPOSITORY nanomsg/nng
         VERSION 2.0.0-alpha.6
+        #VERSION main
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
         OPTIONS
@@ -55,10 +56,40 @@ if(NOT NNG_FOUND)
         add_library(nng::nng ALIAS nng)
     endif()
 else()
+    if(DEFINED NNG_LIBRARIES AND NNG_LIBRARIES)
+        message(STATUS "Found NNG (libs): ${NNG_LIBRARIES}")
+    elseif(TARGET nng::nng)
+        message(STATUS "Found NNG as imported target: nng::nng")
+        # 向后兼容：把变量设为 target 名称（下游最好改用 target）
+        set(NNG_LIBRARIES nng::nng CACHE STRING "NNG libraries (target)")
+    else()
+        message(STATUS "Found NNG but no NNG_LIBRARIES and no nng::nng target")
+    endif()
     message(STATUS "Found NNG: ${NNG_LIBRARIES}")
 endif()
 
-message(STATUS "Using nng ${nng_VERSION}")
+# Determine a usable version string (support several variable namings)
+if(DEFINED NNG_VERSION)
+    set(_nng_version "${NNG_VERSION}")
+elseif(DEFINED nng_VERSION)
+    set(_nng_version "${nng_VERSION}")
+elseif(DEFINED nng_VERSION)
+    set(_nng_version "${nng_VERSION}")
+else()
+    set(_nng_version "<unknown>")
+endif()
+
+# If the package exposes an imported target, prefer that and provide
+# a backward-compatible `NNG_LIBRARIES` variable for old CMakeLists.
+if(TARGET nng::nng)
+    if(NOT (DEFINED NNG_LIBRARIES AND NNG_LIBRARIES))
+        set(NNG_LIBRARIES nng::nng CACHE STRING "NNG libraries (target)")
+    endif()
+    message(STATUS "Found NNG as imported target: nng::nng")
+endif()
+
+message(STATUS "Using nng version: ${_nng_version}")
+message(STATUS "NNG_LIBRARIES variable: ${NNG_LIBRARIES}")
 #[[
 # demo
 add_executable(nng_example src/main.c)

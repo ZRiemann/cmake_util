@@ -94,7 +94,7 @@ target_include_directories(cuda_demo PRIVATE .
                             )
 
 add_custom_target(run_cuda_demo
-    COMMAND $<TARGET_FILE:cuda_demo> ${PROJECT_SOURCE_DIR}/doc/config/uni_server.json
+    COMMAND $<TARGET_FILE:cuda_demo> ${PROJECT_SOURCE_DIR}/doc/config/server.json
     DEPENDS cuda_demo
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Running cuda_demo..."

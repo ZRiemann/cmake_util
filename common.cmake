@@ -32,9 +32,17 @@ target_compile_options(cxx_options INTERFACE
                        $<${msvc_cxx}:$<BUILD_INTERFACE:/W3>>
                        $<$<AND:${gcc_like_cxx},$<CONFIG:Debug>>:$<BUILD_INTERFACE:-O0;-g3;-fno-omit-frame-pointer>>
                       )
+# strip 缩小Release版本程序的体积
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s")
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -s")
+endif()
 
 # 让 CMake 能在 ~/.local 下找包
 list(PREPEND CMAKE_PREFIX_PATH "$ENV{HOME}/.local")
+
+# spdlog 输出相对路径
+add_compile_options(-fmacro-prefix-map=${CMAKE_SOURCE_DIR}= -ffile-prefix-map=${CMAKE_SOURCE_DIR}=)
 
 # config c++ definitions
 string(TIMESTAMP COMPILE_TIME %Y-%m-%d_%H:%M:%S)
@@ -193,4 +201,7 @@ if(NOT CPM_CONTENT MATCHES "CPM")
 endif()
 
 include(${CPM_DIR})
+
+# Provide helper to create run_<target> custom targets
+include(${CMAKE_CURRENT_LIST_DIR}/add_run_target.cmake)
 
