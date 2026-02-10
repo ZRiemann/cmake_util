@@ -1,2 +1,2 @@
 @echo off
-python -u "%~dp0\scripts\cbuild.py" %*
+python -u "%~dp0\cmake_util\cbuild.py" %*
