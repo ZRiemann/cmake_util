@@ -21,6 +21,11 @@ else()
     message(WARNING "LTO NOT ENABLED")
 endif()
 
+# Require C++20 for coroutine support (folly::coro requires C++20)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # config c++ flags
 add_library(cxx_options INTERFACE)
 target_compile_features(cxx_options INTERFACE cxx_std_20)
