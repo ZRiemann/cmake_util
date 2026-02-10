@@ -9,4 +9,5 @@ else
   echo "Python not found. Please install Python 3." >&2
   exit 1
 fi
-exec "$PY" "$(dirname "$0")/scripts/cbuild.py" "$@"
+exec "$PY" "$(dirname "$0")/cmake_util/cbuild.py" "$@"
+
