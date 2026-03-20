@@ -1,4 +1,7 @@
-find_package(NNG QUIET)
+find_package(nng QUIET CONFIG)
+if(NOT TARGET nng::nng)
+    find_package(NNG QUIET)
+endif()
 
 #sudo apt update
 #sudo apt install libmbedtls-dev
@@ -32,7 +35,11 @@ else()
     message(STATUS "Found MbedTLS: ${MbedTLS_VERSION}")
 endif()
 ]]
-if(NOT NNG_FOUND)
+if(NOT TARGET nng::nng)
+    if(ZPP_USE_CONAN)
+        message(FATAL_ERROR "nng was not found. Install it first with zeta_forge/nng/cbuild.sh --install")
+    endif()
+
     message(STATUS "NNG not found, will download and build it")
     CPMAddPackage(
         NAME nng

@@ -1,7 +1,11 @@
 
-find_package(GTest QUIET)
+find_package(GTest QUIET CONFIG)
 
 if(NOT GTest_FOUND)
+    if(ZPP_USE_CONAN)
+        message(FATAL_ERROR "GTest was not found in Conan mode")
+    endif()
+
     message(STATUS "GTest not found, will download and build it")
     CPMAddPackage(
         NAME GTest

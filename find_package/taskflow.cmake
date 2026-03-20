@@ -10,9 +10,13 @@ if (DEFINED TASKFLOW_ROOT)
   return()
 endif()
 
-find_package(Taskflow QUIET)
+find_package(Taskflow QUIET CONFIG)
 
 if(NOT TARGET Taskflow::Taskflow)
+  if(ZPP_USE_CONAN)
+    message(FATAL_ERROR "Taskflow was not found in Conan mode")
+  endif()
+
     message(STATUS "Taskflow not found, will download it")
     # 添加 Taskflow
     CPMAddPackage(

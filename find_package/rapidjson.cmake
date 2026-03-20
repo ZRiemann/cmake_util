@@ -10,33 +10,43 @@ if (DEFINED RAPIDJSON_ROOT)
   return()
 endif()
 
-find_package(RapidJSON QUIET)
+find_package(RapidJSON QUIET CONFIG)
+
+if(TARGET rapidjson AND NOT TARGET rapidjson::rapidjson)
+  add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+  set_target_properties(rapidjson::rapidjson PROPERTIES
+    INTERFACE_LINK_LIBRARIES rapidjson
+  )
+elseif(NOT TARGET rapidjson::rapidjson AND DEFINED RAPIDJSON_INCLUDE_DIRS AND NOT "${RAPIDJSON_INCLUDE_DIRS}" STREQUAL "")
+  add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+  set_target_properties(rapidjson::rapidjson PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${RAPIDJSON_INCLUDE_DIRS}"
+  )
+endif()
 
 if(NOT TARGET rapidjson::rapidjson)
-    message(STATUS "RapidJSON not found, will download it")
-    # 添加 RapidJSON
-    CPMAddPackage(
-        NAME rapidjson
-        URL https://github.com/Tencent/rapidjson/archive/refs/tags/v1.1.0.zip
-        URL_HASH SHA256=8e00c38829d6785a2dfb951bb87c6974fa07dfe488aa5b25deec4b8bc0f6a3ab
-        DOWNLOAD_ONLY YES
-    )
-    #[[
-    CPMAddPackage(
-        NAME rapidjson
-        GITHUB_REPOSITORY Tencent/rapidjson
-        GIT_TAG v1.1.0
+    include(FetchContent)
+
+    set(_rapidjson_git_tag "24b5e7a8b27f42fa16b96fc70aade9106cf7102f")
+    message(STATUS "RapidJSON not found, fetching source revision ${_rapidjson_git_tag}")
+
+    FetchContent_Declare(
+        rapidjson_src
+        GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+        GIT_TAG ${_rapidjson_git_tag}
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
-        DOWNLOAD_ONLY YES  # 仅下载，不构建（因为它是仅头文件库）
     )
-    ]]
+
+    FetchContent_GetProperties(rapidjson_src)
+    if(NOT rapidjson_src_POPULATED)
+        FetchContent_Populate(rapidjson_src)
+    endif()
 
     add_library(rapidjson::rapidjson INTERFACE IMPORTED)
     set_target_properties(rapidjson::rapidjson PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${rapidjson_SOURCE_DIR}/include"
+        INTERFACE_INCLUDE_DIRECTORIES "${rapidjson_src_SOURCE_DIR}/include"
     )
-    #target_link_libraries(myexe_or_lib PUBLIC rapidjson::rapidjson)
 endif()
 
 # 创建可执行文件

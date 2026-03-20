@@ -10,12 +10,23 @@ if (DEFINED SPDLOG_ROOT)
   return()
 endif()
 
-find_package(spdlog QUIET)
+  find_package(spdlog QUIET CONFIG)
+
+  if(TARGET spdlog::spdlog_header_only AND NOT TARGET spdlog::spdlog)
+    add_library(spdlog::spdlog INTERFACE IMPORTED)
+    set_target_properties(spdlog::spdlog PROPERTIES
+      INTERFACE_LINK_LIBRARIES spdlog::spdlog_header_only
+    )
+  endif()
 
 # 检查是否找到
 if(spdlog_FOUND)
     message(STATUS "spdlog found: ${spdlog_DIR}")
 else()
+    if(ZPP_USE_CONAN)
+      message(FATAL_ERROR "spdlog was not found in Conan mode")
+    endif()
+
     message(STATUS "spdlog not found, will download it")
 
     CPMAddPackage(
