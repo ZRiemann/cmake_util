@@ -21,14 +21,21 @@ else()
     message(WARNING "LTO NOT ENABLED")
 endif()
 
-# Require C++20 for coroutine support (folly::coro requires C++20)
-set(CMAKE_CXX_STANDARD 20)
+# Require at least C++20 for coroutine support (folly::coro requires C++20)
+if(NOT DEFINED CMAKE_CXX_STANDARD OR "${CMAKE_CXX_STANDARD}" STREQUAL "")
+  set(CMAKE_CXX_STANDARD 20)
+endif()
+
+if(CMAKE_CXX_STANDARD LESS 20)
+  message(FATAL_ERROR "zpp requires at least C++20; got CMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}")
+endif()
+
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # config c++ flags
 add_library(cxx_options INTERFACE)
-target_compile_features(cxx_options INTERFACE cxx_std_20)
+target_compile_features(cxx_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
 set(gcc_like_cxx $<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>)
 set(msvc_cxx $<COMPILE_LANG_AND_ID:CXX,MSVC>)
